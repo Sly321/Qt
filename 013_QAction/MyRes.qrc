@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/Images">
+        <file>git.png</file>
+        <file>ftp.png</file>
+        <file>chrome.jpeg</file>
+    </qresource>
+</RCC>
