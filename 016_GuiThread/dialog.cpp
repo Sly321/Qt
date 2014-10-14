@@ -2,6 +2,7 @@
 #include "ui_dialog.h"
 #include "mythread.h"
 #include <QMessageBox>
+#include <qDebug>
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -28,6 +29,11 @@ void Dialog::on_pushButton_clicked()
     //Started
     mThread->stop = false;
     mThread->start();
+
+    //mThread->wait(); //waiting until you do smth else
+
+    //qDebug() << "done"; //output when the thread is done
+
     //QMessageBox::information(this, "title", "started");
 }
 

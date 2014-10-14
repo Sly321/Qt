@@ -8,7 +8,7 @@ MyThread::MyThread(QObject *parent) :
 }
 
 void MyThread::run() {
-    for(int i = 0; i < 1000000; i++) {
+    for(int i = 0; i < 100; i++) {
         QMutex mutex;
         mutex.lock();
         if(this->stop) {
@@ -18,6 +18,6 @@ void MyThread::run() {
 
         emit NumberChanged(i);
 
-        this->msleep(100);
+        //this->msleep(100);
     }
 }
