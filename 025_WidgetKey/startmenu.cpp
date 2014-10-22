@@ -3,9 +3,7 @@
 
 #include <QDebug>
 
-StartMenu::StartMenu(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::StartMenu)
+StartMenu::StartMenu(QWidget *parent) : QWidget(parent), ui(new Ui::StartMenu)
 {
     ui->setupUi(this);
 }

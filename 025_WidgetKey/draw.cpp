@@ -20,12 +20,17 @@ Draw::Draw(QWidget *parent) : QWidget(parent)
     seconds->start(1000);
 
     cleanHills.load(":/images/background/hills_clean.png");
+    water.load(":/images/background/water.png");
+    forrest.load(":/images/background/forrest_clean.png");
+    hills.load(":/images/background/forrest.png");
 }
 
 void Draw::paintEvent(QPaintEvent *e) {
     //qDebug() << "paintEvent in draw.cpp";
 
     QRect rect(xpos, ypos, 80, 60);
+
+
 
     QPainter painter(this);
     painter.setPen(QPen(Qt::green));
@@ -37,7 +42,19 @@ void Draw::paintEvent(QPaintEvent *e) {
     textPainter.setBrush(QBrush(Qt::black));
 
     //textPainter.drawPicture(0,0, cleanHills);
-    textPainter.drawImage(0, 200, cleanHills);
+    textPainter.drawImage(0, 0, forrest); //253 × 162
+    textPainter.drawImage(253, 0, forrest);
+    textPainter.drawImage(506, 0, forrest);
+    textPainter.drawImage(0, 172, hills); //190 × 186
+    textPainter.drawImage(190, 172, hills);
+    textPainter.drawImage(380, 172, hills);
+    textPainter.drawImage(570, 172, hills);
+    textPainter.drawImage(0, 340, water); //129 × 57
+    textPainter.drawImage(129, 340, water);
+    textPainter.drawImage(258, 340, water);
+    textPainter.drawImage(387, 340, water);
+    textPainter.drawImage(516, 340, water);
+    textPainter.drawImage(100, 200, cleanHills);
 
     textPainter.drawText(rect, "Block motherfucker D\nAbsatzapproved");
 

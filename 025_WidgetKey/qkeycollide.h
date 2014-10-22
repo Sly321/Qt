@@ -17,12 +17,18 @@ private:
     QStackedWidget *windows;
     Draw *drawWidget;
     QLineEdit *line;
+    QTextEdit *text;
     StartMenu *startmenu;
 
+private slots:
+    void hideChat();
+    void chatLostFocus();
 
 protected:
     void keyPressEvent(QKeyEvent *e);
+    void keyReleaseEvent(QKeyEvent *e);
     void paintEvent(QPaintEvent *e);
+
 };
 
 #endif // QKEYCOLLIDE_H

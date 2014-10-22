@@ -30,6 +30,9 @@ private:
     int fpsInt;
     int i;
     QImage cleanHills;
+    QImage water;
+    QImage forrest;
+    QImage hills;
     QTimer *timerUpdate;
     QTimer *seconds;
 
