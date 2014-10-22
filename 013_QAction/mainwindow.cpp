@@ -13,6 +13,8 @@ MainWindow::MainWindow(QWidget *parent) :
     Statlabel = new QLabel(this);
     Statbar = new QProgressBar(this);
 
+
+
     ui->statusBar->addPermanentWidget(Statlabel);
     ui->statusBar->addPermanentWidget(Statbar);
     Statbar->setTextVisible(false);

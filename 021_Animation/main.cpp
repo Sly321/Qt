@@ -287,6 +287,7 @@ void keyPressEvent(QKeyEvent *event)
     case Qt::Key_Space:
         break;
     case Qt::Key_D:
+        qDebug() << "keyPressEvent: D";
         break;
     default:
         break;

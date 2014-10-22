@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/images/background">
+        <file>hills_clean.png</file>
+    </qresource>
+    <qresource prefix="/images/icons">
+        <file>newgame.jpg</file>
+    </qresource>
+</RCC>
