@@ -4,9 +4,9 @@
 /***********************************************
 Menu windows defines for setCurrentWidget(int);
 ***********************************************/
-#define START_MENU   1;
-#define OPTIONS_MENU 2;
-#define CHAMP_SELECT 3;
-#define STAGE_WINDOW 4;
+#define START_MENU   0
+#define OPTIONS_MENU 1
+#define STAGE_WINDOW 2
+#define CHAMP_SELECT 3
 
 #endif // DEFINITIONS_H

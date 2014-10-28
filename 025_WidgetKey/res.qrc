@@ -8,6 +8,10 @@
     </qresource>
     <qresource prefix="/images/icons">
         <file>newgame.jpg</file>
+        <file>icon.png</file>
+        <file>icon2.gif</file>
     </qresource>
-    <qresource prefix="/new/prefix1"/>
+    <qresource prefix="/sprites">
+        <file>stand.png</file>
+    </qresource>
 </RCC>

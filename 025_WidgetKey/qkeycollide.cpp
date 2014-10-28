@@ -75,7 +75,7 @@ void QKeyCollide::keyPressEvent(QKeyEvent *e) {
     case Qt::Key_3:
         qDebug() << "keyPressEvent: 3";
         windows->setCurrentIndex(2);
-        drawWidget->setFocus();
+        //drawWidget->setFocus();
         qDebug() << "Focus switched to Window 3";
         break;
     case Qt::Key_4:
@@ -233,14 +233,16 @@ void QKeyCollide::keyReleaseEvent(QKeyEvent *e) {
     }
 }
 
-void QKeyCollide::setChooseMenu(int a) {
+void QKeyCollide::setChooseMenu(int selected) {
     qDebug() << "SLOT setChooseMenu() in QKeyCollide";
-    if (a == 3) {
-        windows->setCurrentIndex(a);
-        chooseMenu->setFocus();
-    }
-    if (a == 0) {
-        windows->setCurrentIndex(a);
+    switch (selected) {
+    case START_MENU:
+        windows->setCurrentIndex(START_MENU);
         this->setFocus();
+        break;
+    case CHAMP_SELECT:
+        windows->setCurrentIndex(CHAMP_SELECT);
+        chooseMenu->setFocus();
+        break;
     }
 }

@@ -3,18 +3,6 @@
 
 #include <QDebug>
 
-class TextTitel : public QGraphicsWidget
-{
-public:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-               QWidget *widget) {
-        painter->setBrush(Qt::red);
-        painter->setPen(Qt::green);
-        painter->drawRect(rect());
-        painter->drawText(rect(), "Überschrift");
-    }
-};
-
 StartMenu::StartMenu(QWidget *parent) : QWidget(parent), ui(new Ui::StartMenu)
 {
     countAnimation = 0;

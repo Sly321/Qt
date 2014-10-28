@@ -2,11 +2,24 @@
 
 #include <QtWidgets>
 
+
 ChooseMenu::ChooseMenu(QWidget *parent) : QWidget(parent)
 {
+
     parentWindow = parent;
     pushButtonBack = new QPushButton("Back", this);
-    rectChoose = new QPushButton("Choose", this);
+    rectChoose = new QPushButton(this);
+
+
+
+    icon1.load(":/images/icons/icon.png");
+    icon2.load(":/images/icons/icon2.gif");
+    rectChoose->setStyleSheet("QPushButton { background-color: rgba(255,255,255, 20%); border-width: 5px; border-color: green; border-style: outset;}");
+
+    QRect *rectofbla = new QRect(25,25,25,25);
+    size_t offset = rectofbla->x() * icon1.depth() / 8 + rectofbla->y() * icon1.bytesPerLine();
+    icon3 = QImage(icon1.bits() + offset, rectofbla->width(), rectofbla->height(), icon1.bytesPerLine(), icon1.format());
+
     machine = new QStateMachine;
 
     /* States */
@@ -144,11 +157,16 @@ ChooseMenu::ChooseMenu(QWidget *parent) : QWidget(parent)
     machine->start();
 
     connect(pushButtonBack, SIGNAL(clicked()), this, SLOT(backToStartmenu()));
+
+    connect(machine, SIGNAL(entered()), this, SLOT(selected()));
 }
 
 void ChooseMenu::paintEvent(QPaintEvent *e) {
     QSize rectSize(100, 100);
     QPainter painter(this);
+    painter.drawImage(245,145, icon1);
+    painter.drawImage(350,145, icon2);
+    painter.drawImage(455, 145, icon3);
     for (int x = 0; x < 3; x++) {
         for (int y = 0; y < 3; y++) {
             int posX = 245 + (100 * x) + (5 * x);
@@ -159,11 +177,10 @@ void ChooseMenu::paintEvent(QPaintEvent *e) {
     }
     QPen pen(QBrush(Qt::green), 2);
 
-
     painter.setPen(pen);
-    painter.drawRect(245,145,100,100);
 
 
+    painter.drawText(QRect(245, 460, 310, 100), selectedString, QTextOption(Qt::AlignCenter));
 }
 
 void ChooseMenu::keyPressEvent(QKeyEvent *e) {
@@ -194,4 +211,9 @@ void ChooseMenu::keyPressEvent(QKeyEvent *e) {
 
 void ChooseMenu::backToStartmenu() {
     emit setCurrent(0);
+}
+
+void ChooseMenu::selected() {
+    selectedString = "Top";
+    qDebug() << "selected() called";
 }

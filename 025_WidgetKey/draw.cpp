@@ -6,6 +6,9 @@ Draw::Draw(QWidget *parent) : QWidget(parent)
     /* Bools initialization */
     showFps = false;
 
+
+    sprite = new Sprite(QImage(":/sprites/stand.png"));
+
     parentWindow = parent;
 
     animRect.setCoords(10,10,10,10);
@@ -45,39 +48,47 @@ void Draw::paintEvent(QPaintEvent *e) {
 
     QRect rect(xpos, ypos, 80, 60);
 
-    QPainter painter(this);
-    painter.setPen(QPen(Qt::green));
-    painter.setBrush(QBrush(Qt::blue));
-    //painter.drawRect(rect);
 
-    //QPainter textPainter(this);
-    //textPainter.setPen(QPen(Qt::red));
-    //textPainter.setBrush(QBrush(Qt::black));
+    QPainter textPainter(this);
+    textPainter.setPen(QPen(Qt::darkGreen));
+    textPainter.setBrush(QBrush(Qt::darkGreen));
 
     //textPainter.drawPicture(0,0, cleanHills);
-    /*
+
+    textPainter.drawRect(QRect(0, 0, 800, 110));
+
     textPainter.drawImage(0, 0, forrest); //253 × 162
     textPainter.drawImage(253, 0, forrest);
     textPainter.drawImage(506, 0, forrest);
-    textPainter.drawImage(0, 172, hills); //190 × 186
-    textPainter.drawImage(190, 172, hills);
-    textPainter.drawImage(380, 172, hills);
-    textPainter.drawImage(570, 172, hills);
-    textPainter.drawImage(0, 340, water); //129 × 57
-    textPainter.drawImage(129, 340, water);
-    textPainter.drawImage(258, 340, water);
-    textPainter.drawImage(387, 340, water);
-    textPainter.drawImage(516, 340, water);
-    textPainter.drawImage(100, 200, cleanHills);*/
+    textPainter.drawImage(759, 0, forrest);
+    textPainter.drawImage(0, 272, hills); //190 × 186
+    textPainter.drawImage(190, 272, hills);
+    textPainter.drawImage(380, 272, hills);
+    textPainter.drawImage(570, 272, hills);
+    textPainter.drawImage(760, 272, hills);
+    textPainter.drawImage(0, 440, water); //129 × 57
+    textPainter.drawImage(129, 440, water);
+    textPainter.drawImage(258, 440, water);
+    textPainter.drawImage(387, 440, water);
+    textPainter.drawImage(516, 440, water);
+    textPainter.drawImage(645, 440, water);
+    textPainter.drawImage(774, 440, water);
+    textPainter.drawImage(100, 300, cleanHills);
 
     //textPainter.drawText(rect, "Block motherfucker D\nAbsatzapproved");
 
     //painter.draw
 
     i++;
-    //if(showFps) { textPainter.drawText(QRect(500,0,80,20), "FPS: " + QString::number(fpsInt)); }
 
-    painter.drawRect(animRect);
+    textPainter.setPen(QPen(Qt::red));
+    textPainter.setBrush(QBrush(Qt::yellow));
+
+    if(showFps) { textPainter.drawText(QRect(700,0,80,20), "FPS: " + QString::number(fpsInt)); }
+
+    textPainter.drawImage(200,180, sprite->getImage(2));
+    textPainter.drawRect(animRect);
+    textPainter.drawText(animRect, "X", QTextOption(Qt::AlignCenter));
 
 }
 
@@ -115,6 +126,7 @@ int Draw::fps() {
 }
 
 void Draw::setFpsVisible(bool b) {
+    qDebug() << "Fps visible: " + b;
     showFps = b;
 }
 

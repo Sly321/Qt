@@ -4,6 +4,8 @@
 #include <QtWidgets>
 #include <QTimer>
 
+#include "sprite.h"
+
 class Draw : public QWidget
 {
     Q_OBJECT
@@ -28,6 +30,8 @@ public slots:
     int fps();
 
 private:
+    QImage spriteImage;
+    Sprite *sprite;
     QRect animRect;
     bool showFps;
     int xpos;

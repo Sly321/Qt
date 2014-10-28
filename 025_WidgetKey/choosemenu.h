@@ -10,6 +10,12 @@ public:
     explicit ChooseMenu(QWidget *parent = 0);
 
 private:
+    QString selectedString;
+    QImage icon1;
+    QImage icon2;
+    QImage icon3;
+    QImage icon4;
+
     QWidget *parentWindow;
     QPushButton *pushButtonBack;
 
@@ -69,6 +75,7 @@ public slots:
 
 private slots:
     void backToStartmenu();
+    void selected();
 
 protected:
     void paintEvent(QPaintEvent *e);
