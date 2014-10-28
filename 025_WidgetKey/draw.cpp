@@ -6,6 +6,11 @@ Draw::Draw(QWidget *parent) : QWidget(parent)
     /* Bools initialization */
     showFps = false;
 
+    parentWindow = parent;
+
+    animRect.setCoords(10,10,10,10);
+    animRect.setSize(QSize(50,50));
+
     /* Int initialization */
     xpos = 0;
     ypos = 0;
@@ -23,6 +28,16 @@ Draw::Draw(QWidget *parent) : QWidget(parent)
     water.load(":/images/background/water.png");
     forrest.load(":/images/background/forrest_clean.png");
     hills.load(":/images/background/forrest.png");
+
+    /* Animation */
+    animation = new QPropertyAnimation(this, "q_animRect");
+    animation->setEndValue(QRect(10,300,50,50));
+    animation->setEasingCurve(QEasingCurve::OutBounce);
+    animation->setDuration(2000);
+    animation->setLoopCount(5);
+
+    connect(animation, SIGNAL(currentLoopChanged(int)), animation, SLOT(pause()));
+
 }
 
 void Draw::paintEvent(QPaintEvent *e) {
@@ -30,18 +45,17 @@ void Draw::paintEvent(QPaintEvent *e) {
 
     QRect rect(xpos, ypos, 80, 60);
 
-
-
     QPainter painter(this);
     painter.setPen(QPen(Qt::green));
     painter.setBrush(QBrush(Qt::blue));
-    painter.drawRect(rect);
+    //painter.drawRect(rect);
 
-    QPainter textPainter(this);
-    textPainter.setPen(QPen(Qt::red));
-    textPainter.setBrush(QBrush(Qt::black));
+    //QPainter textPainter(this);
+    //textPainter.setPen(QPen(Qt::red));
+    //textPainter.setBrush(QBrush(Qt::black));
 
     //textPainter.drawPicture(0,0, cleanHills);
+    /*
     textPainter.drawImage(0, 0, forrest); //253 × 162
     textPainter.drawImage(253, 0, forrest);
     textPainter.drawImage(506, 0, forrest);
@@ -54,12 +68,17 @@ void Draw::paintEvent(QPaintEvent *e) {
     textPainter.drawImage(258, 340, water);
     textPainter.drawImage(387, 340, water);
     textPainter.drawImage(516, 340, water);
-    textPainter.drawImage(100, 200, cleanHills);
+    textPainter.drawImage(100, 200, cleanHills);*/
 
-    textPainter.drawText(rect, "Block motherfucker D\nAbsatzapproved");
+    //textPainter.drawText(rect, "Block motherfucker D\nAbsatzapproved");
+
+    //painter.draw
 
     i++;
-    if(showFps) { textPainter.drawText(QRect(500,0,80,20), "FPS: " + QString::number(fpsInt)); }
+    //if(showFps) { textPainter.drawText(QRect(500,0,80,20), "FPS: " + QString::number(fpsInt)); }
+
+    painter.drawRect(animRect);
+
 }
 
 void Draw::moveRight() {
@@ -101,4 +120,28 @@ void Draw::setFpsVisible(bool b) {
 
 bool Draw::isFpsVisible() {
     return showFps;
+}
+
+void Draw::f_animation() {
+    animation->start();
+}
+
+void Draw::e_animation() {
+    animation->resume();
+}
+
+void Draw::keyPressEvent(QKeyEvent *e) {
+
+        switch (e->key()) {
+
+            /* Numeric Keys */
+        case Qt::Key_0:
+            qDebug() << "keyPressEvent: 0 in Draw";
+            break;
+        case Qt::Key_1:
+            qDebug() << "keyPressEvent: 1 in Draw";
+            parentWindow->setFocus();
+            qDebug() << "Focus switched to ParentWidget";
+            break;
+        }
 }

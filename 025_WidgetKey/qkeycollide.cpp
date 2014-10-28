@@ -1,6 +1,8 @@
 #include "qkeycollide.h"
 #include "draw.h"
 #include "startmenu.h"
+#include "chat.h"
+#include "definitions.h"
 
 #include <QStackedWidget>
 #include <QtWidgets>
@@ -16,60 +18,43 @@ QKeyCollide::QKeyCollide(QWidget *parent)
     scene.addRect(QRectF(0, 0, 100, 200), QPen(Qt::black), QBrush(Qt::green));
 
     this->setWindowTitle("QKeyCollide");
-    this->setMinimumSize(QSize(600, 400));
+    this->setMinimumSize(QSize(800, 600));
     //this->setStyleSheet("QWidget { opacity: 10; }");
 
     windows = new QStackedWidget(this);
     startmenu = new StartMenu();
 
     QWidget *test2 = new QWidget();
-    test2->setWindowTitle("test2");
 
     QLabel *label2 = new QLabel("Test2\nIn the terminal, you can also see all keys i registered.");
     QVBoxLayout *test2Layout = new QVBoxLayout;
     test2Layout->addWidget(label2);
     test2->setLayout(test2Layout);
 
-    drawWidget = new Draw();
-    drawWidget->setWindowTitle("test3");
-
-    QLabel *label3 = new QLabel("Test3\nLast Widget, implemented pantEvent here");
-    QVBoxLayout *test3Layout = new QVBoxLayout;
-    test3Layout->addWidget(label3);
-    drawWidget->setLayout(test3Layout);
+    drawWidget = new Draw(this);
+    chooseMenu = new ChooseMenu(this);
 
     windows->addWidget(startmenu);
     windows->addWidget(test2);
     windows->addWidget(drawWidget);
+    windows->addWidget(chooseMenu);
 
-    QLabel *description = new QLabel("Use also the keys 1 - 3 to switch window content\nuse Enter to get into the console line, enter '/help' for infos");
+    windows->setGeometry(QRect(0,0,800,600));
 
-    //QLabel *testImage = new QLabel();
-    //testImage->setPixmap("/images/background/hills_clean.png");
-    //testImage->setPixmap(QPixmap(":/images/background/hills_clean.png"));
-
-    windows->setGeometry(QRect(0,0,600,400));
     QVBoxLayout *wdg1 = new QVBoxLayout;
     wdg1->addWidget(windows);
-
     QVBoxLayout *mainLayout = new QVBoxLayout(windows);
 
-    line = new QLineEdit;
-    line->setStyleSheet("QLineEdit { background-color: rgba(0,0,0, 70%); color: white; }");
-    line->setVisible(false);
-    //connect(line, SIGNAL(returnPressed()), this, SLOT(chatLostFocus()));
+    chat = new Chat(this);
 
-    text = new QTextEdit;
-    text->setStyleSheet("QTextEdit { background-color: rgba(0,0,0, 70%); color: white; }");
-    text->setVisible(false);
-    text->setReadOnly(true);
-    text->setText("Welcome!");
-
-    mainLayout->addSpacing(300);
-    mainLayout->addWidget(description);
-    mainLayout->addWidget(text);
-    mainLayout->addWidget(line);
+    mainLayout->addSpacing(400);
+    mainLayout->addWidget(chat);
     this->setLayout(mainLayout);
+    this->setFixedSize(800,600);
+
+    connect(chat, SIGNAL(setCurrent(int)), windows, SLOT(setCurrentIndex(int)));
+    connect(startmenu, SIGNAL(setCurrent(int)), this, SLOT(setChooseMenu(int)));
+    connect(chooseMenu, SIGNAL(setCurrent(int)), this, SLOT(setChooseMenu(int)));
 }
 
 void QKeyCollide::keyPressEvent(QKeyEvent *e) {
@@ -90,6 +75,8 @@ void QKeyCollide::keyPressEvent(QKeyEvent *e) {
     case Qt::Key_3:
         qDebug() << "keyPressEvent: 3";
         windows->setCurrentIndex(2);
+        drawWidget->setFocus();
+        qDebug() << "Focus switched to Window 3";
         break;
     case Qt::Key_4:
         qDebug() << "keyPressEvent: 4";
@@ -137,6 +124,7 @@ void QKeyCollide::keyPressEvent(QKeyEvent *e) {
         break;
     case Qt::Key_C:
         qDebug() << "keyPressEvent: C";
+        drawWidget->e_animation();
         break;
     case Qt::Key_D:
         qDebug() << "keyPressEvent: D";
@@ -146,6 +134,7 @@ void QKeyCollide::keyPressEvent(QKeyEvent *e) {
         break;
     case Qt::Key_F:
         qDebug() << "keyPressEvent: F";
+        startmenu->Anim();
         break;
     case Qt::Key_G:
         qDebug() << "keyPressEvent: G";
@@ -200,10 +189,11 @@ void QKeyCollide::keyPressEvent(QKeyEvent *e) {
         break;
     case Qt::Key_X:
         qDebug() << "keyPressEvent: X";
+        drawWidget->f_animation();
         break;
     case Qt::Key_Y:
         qDebug() << "keyPressEvent: Y";
-        text->setVisible(true);
+        chat->showOnlyChat();
         break;
     case Qt::Key_Z:
         qDebug() << "keyPressEvent: Z";
@@ -222,14 +212,8 @@ void QKeyCollide::keyPressEvent(QKeyEvent *e) {
         }
         break;
     case Qt::Key_Return:
-        qDebug() << "keyPressEvent: enter";        
-        if(line->isVisible()) {
-            hideChat();
-        } else {
-            line->setVisible(true);
-            text->setVisible(true);
-            line->setFocus();
-        }
+        qDebug() << "keyPressEvent: enter";
+        chat->singnal();
         break;
     default:
         QWidget::keyPressEvent(e);
@@ -240,54 +224,23 @@ void QKeyCollide::paintEvent(QPaintEvent *e) {
     //qDebug() << "paintEvent in qkeycollide.cpp";
 }
 
-void QKeyCollide::hideChat() {
-    if (line->isVisible()) {
-        /* Chat wird kleiner manchmal ?! */
-
-        if (line->text() != "") {
-            text->setText(text->toPlainText() + "\n" + line->text());
-        }
-        text->verticalScrollBar()->setValue(text->verticalScrollBar()->maximum());
-
-        if(line->text() == "/1") {
-            windows->setCurrentIndex(0);
-        } else if (line->text() == "/2") {
-            windows->setCurrentIndex(1);
-        } else if (line->text() == "/3") {
-            windows->setCurrentIndex(2);
-        } else if (line->text() == "/fps") {
-            drawWidget->setFpsVisible(!drawWidget->isFpsVisible());
-        } else if (line->text() == "/quit") {
-            this->close();
-        } else if (line->text() == "/help") {
-            QMessageBox::information(this, "Help",
-            "This Console line supports: \n\n/1 - /3 : for switching window states\n/quit  : for closing the window\n/fps   : for showing the fps in the 3rd window\n/clearchat : for clearing the chat window");
-        } else if (line->text() == "/clearchat") {
-            text->clear();
-        }
-
-        line->clear();
-        qDebug() << "hideChat()";
-        line->setVisible(false);
-        text->setVisible(false);
-        this->setFocus();
-    }
-}
-
 void QKeyCollide::keyReleaseEvent(QKeyEvent *e) {
     switch (e->key()) {
     case Qt::Key_Y:
         qDebug() << "keyReleaseEvent: Y";
-        if (!line->isVisible()) {
-            text->setVisible(false);
-        }
+            chat->hideOnlyChat();
         break;
     }
 }
 
-void QKeyCollide::chatLostFocus() {
-    qDebug() << "chatLostFocus()";
-    line->setVisible(false);
-    text->setVisible(false);
-    this->setFocus();
+void QKeyCollide::setChooseMenu(int a) {
+    qDebug() << "SLOT setChooseMenu() in QKeyCollide";
+    if (a == 3) {
+        windows->setCurrentIndex(a);
+        chooseMenu->setFocus();
+    }
+    if (a == 0) {
+        windows->setCurrentIndex(a);
+        this->setFocus();
+    }
 }

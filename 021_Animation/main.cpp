@@ -1,297 +1,257 @@
-#include <QtCore>
-#include <QtWidgets>
+/****************************************************************************
+**
+** Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+** All rights reserved.
+** Contact: Nokia Corporation (qt-info@nokia.com)
+**
+** This file is part of the QtCore module of the Qt Toolkit.
+**
+** $QT_BEGIN_LICENSE:LGPL$
+** Commercial Usage
+** Licensees holding valid Qt Commercial licenses may use this file in
+** accordance with the Qt Commercial License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Nokia.
+**
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+** In addition, as a special exception, Nokia gives you certain additional
+** rights.  These rights are described in the Nokia Qt LGPL Exception
+** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+**
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 3.0 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU General Public License version 3.0 requirements will be
+** met: http://www.gnu.org/copyleft/gpl.html.
+**
+** If you have questions regarding the use of this file, please contact
+** Nokia at qt-info@nokia.com.
+** $QT_END_LICENSE$
+**
+****************************************************************************/
 
-class StateSwitchEvent: public QEvent
+#include <QtGui>
+#include <QtCore/qstate.h>
+
+class Pixmap : public QObject, public QGraphicsPixmapItem
 {
+    Q_OBJECT
+    Q_PROPERTY(QPointF pos READ pos WRITE setPos)
 public:
-    StateSwitchEvent()
-        : QEvent(Type(StateSwitchType))
+    Pixmap(const QPixmap &pix)
+        : QObject(), QGraphicsPixmapItem(pix)
     {
+        setCacheMode(DeviceCoordinateCache);
     }
-
-    explicit StateSwitchEvent(int rand)
-        : QEvent(Type(StateSwitchType)),
-          m_rand(rand)
-    {
-    }
-
-    enum { StateSwitchType = QEvent::User + 256 };
-
-    int rand() const { return m_rand; }
-
-private:
-    int m_rand;
 };
 
-class QGraphicsRectWidget : public QGraphicsWidget
-{
-public:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *,
-               QWidget *)
-    {
-        painter->fillRect(rect(), Qt::blue);
-    }
-};
-
-class QGraphicsCircleWidget : public QGraphicsWidget
-{
-public:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *,
-               QWidget *)
-    {
-        painter->setBrush(Qt::black);
-        painter->setPen(Qt::black);
-        painter->drawEllipse(rect());
-    }
-};
-
-class StateSwitchTransition: public QAbstractTransition
-{
-public:
-    StateSwitchTransition(int rand)
-        : QAbstractTransition(),
-          m_rand(rand)
-    {
-    }
-
-protected:
-    virtual bool eventTest(QEvent *event)
-    {
-        return (event->type() == QEvent::Type(StateSwitchEvent::StateSwitchType))
-            && (static_cast<StateSwitchEvent *>(event)->rand() == m_rand);
-    }
-
-    virtual void onTransition(QEvent *) {}
-
-private:
-    int m_rand;
-};
-
-class StateSwitcher : public QState
+class Button : public QGraphicsWidget
 {
     Q_OBJECT
 public:
-    StateSwitcher(QStateMachine *machine)
-        : QState(machine), m_stateCount(0), m_lastIndex(0)
-    { }
-
-    virtual void onEntry(QEvent *)
+    Button(const QPixmap &pixmap, QGraphicsItem *parent = 0)
+        : QGraphicsWidget(parent), _pix(pixmap)
     {
-        int n;
-        while ((n = (qrand() % m_stateCount + 1)) == m_lastIndex)
-        { }
-        m_lastIndex = n;
-        machine()->postEvent(new StateSwitchEvent(n));
+        setAcceptHoverEvents(true);
+        setCacheMode(DeviceCoordinateCache);
     }
-    virtual void onExit(QEvent *) {}
 
-    void addState(QState *state, QAbstractAnimation *animation) {
-        StateSwitchTransition *trans = new StateSwitchTransition(++m_stateCount);
-        trans->setTargetState(state);
-        addTransition(trans);
-        trans->addAnimation(animation);
+    QRectF boundingRect() const
+    {
+        return QRectF(-65, -65, 130, 130);
+    }
+
+    QPainterPath shape() const
+    {
+        QPainterPath path;
+        path.addEllipse(boundingRect());
+        return path;
+    }
+
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
+    {
+        bool down = option->state & QStyle::State_Sunken;
+        QRectF r = boundingRect();
+        QLinearGradient grad(r.topLeft(), r.bottomRight());
+        grad.setColorAt(down ? 1 : 0, option->state & QStyle::State_MouseOver ? Qt::white : Qt::lightGray);
+        grad.setColorAt(down ? 0 : 1, Qt::darkGray);
+        painter->setPen(Qt::darkGray);
+        painter->setBrush(grad);
+        painter->drawEllipse(r);
+        QLinearGradient grad2(r.topLeft(), r.bottomRight());
+        grad.setColorAt(down ? 1 : 0, Qt::darkGray);
+        grad.setColorAt(down ? 0 : 1, Qt::lightGray);
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(grad);
+        if (down)
+            painter->translate(2, 2);
+        painter->drawEllipse(r.adjusted(5, 5, -5, -5));
+        painter->drawPixmap(-_pix.width()/2, -_pix.height()/2, _pix);
+    }
+
+signals:
+    void pressed();
+
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *)
+    {
+        emit pressed();
+        update();
+    }
+
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *)
+    {
+        update();
     }
 
 private:
-    int m_stateCount;
-    int m_lastIndex;
+    QPixmap _pix;
 };
 
-QState *createGeometryState(QObject *w1, const QRect &rect1,
-                            QObject *w2, const QRect &rect2,
-                            QObject *w3, const QRect &rect3,
-                            QObject *w4, const QRect &rect4,
-                            QObject *w5, const QRect &rect5,
-                            QObject *w6, const QRect &rect6,
-                            QObject *w7, const QRect &rect7,
-                            QObject *w8, const QRect &rect8, QState *parent)
+class View : public QGraphicsView
 {
-    QState *result = new QState(parent);
-    result->assignProperty(w1, "geometry", rect1);
-    result->assignProperty(w2, "geometry", rect2);
-    result->assignProperty(w3, "geometry", rect3);
-    result->assignProperty(w4, "geometry", rect4);
-    result->assignProperty(w5, "geometry", rect5);
-    result->assignProperty(w6, "geometry", rect6);
-    result->assignProperty(w7, "geometry", rect7);
-    result->assignProperty(w8, "geometry", rect8);
-    return result;
-}
-
-class GraphicsView : public QGraphicsView
-{
-    Q_OBJECT
 public:
-    GraphicsView(QGraphicsScene *scene, QWidget *parent = NULL) : QGraphicsView(scene, parent)
-    {
-    }
+    View(QGraphicsScene *scene) : QGraphicsView(scene) { }
 
 protected:
-    virtual void resizeEvent(QResizeEvent *event)
+    void resizeEvent(QResizeEvent *event)
     {
-        fitInView(scene()->sceneRect());
         QGraphicsView::resizeEvent(event);
+        fitInView(sceneRect(), Qt::KeepAspectRatio);
     }
 };
-
-
 
 int main(int argc, char **argv)
 {
+    Q_INIT_RESOURCE(animatedtiles);
+
     QApplication app(argc, argv);
 
-    QGraphicsCircleWidget *button1 = new QGraphicsCircleWidget;
-    QGraphicsCircleWidget *button2 = new QGraphicsCircleWidget;
-    QGraphicsCircleWidget *button3 = new QGraphicsCircleWidget;
-    QGraphicsCircleWidget *button4 = new QGraphicsCircleWidget;
-    QGraphicsCircleWidget *button5 = new QGraphicsCircleWidget;
-    QGraphicsCircleWidget *button6 = new QGraphicsCircleWidget;
-    QGraphicsCircleWidget *button7 = new QGraphicsCircleWidget;
-    QGraphicsCircleWidget *button8 = new QGraphicsCircleWidget;
+    QPixmap kineticPix(":/images/kinetic.png");
+    QPixmap bgPix(":/images/Time-For-Lunch-2.jpg");
 
-    QGraphicsScene scene(0, 0, 800, 600);
-    scene.setBackgroundBrush(Qt::white);
-    scene.addItem(button1);
-    scene.addItem(button2);
-    scene.addItem(button3);
-    scene.addItem(button4);
-    scene.addItem(button5);
-    scene.addItem(button6);
-    scene.addItem(button7);
-    scene.addItem(button8);
+    QGraphicsScene scene(-350, -350, 700, 700);
 
-    GraphicsView window(&scene);
-    window.setFrameStyle(0);
-    window.setAlignment(Qt::AlignLeft | Qt::AlignTop);
-    window.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    window.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-    QStateMachine machine;
-
-    QState *group = new QState();
-    group->setObjectName("group");
-    QTimer timer;
-    timer.setInterval(1250);
-    timer.setSingleShot(true);
-    QObject::connect(group, SIGNAL(entered()), &timer, SLOT(start()));
-
-    QState *state1;
-    QState *state2;
-
-    state1 = createGeometryState(button1, QRect(12, 0, 25, 25),
-                                 button2, QRect(37, 0, 50, 50),
-                                 button3, QRect(87, 0, 25, 25),
-                                 button4, QRect(112, 0, 50, 50),
-                                 button5, QRect(162, 0, 25, 25),
-                                 button6, QRect(187, 0, 50, 50),
-                                 button7, QRect(237, 0, 25, 25),
-                                 button8, QRect(262, 0, 50, 50), group);
-    state2 = createGeometryState(button1, QRect(0, 250, 50, 50),
-                                 button2, QRect(50, 280, 25, 25),
-                                 button3, QRect(75, 250, 50, 50),
-                                 button4, QRect(125, 280, 25, 25),
-                                 button5, QRect(150, 250, 50, 50),
-                                 button6, QRect(200, 280, 25, 25),
-                                 button7, QRect(225, 250, 50, 50),
-                                 button8, QRect(275, 280, 25, 25), group);
-    group->setInitialState(state1);
-
-    QParallelAnimationGroup animationGroup;
-    QSequentialAnimationGroup *subGroup;
-
-    subGroup = new QSequentialAnimationGroup(&animationGroup);
-    subGroup->addPause(200);
-    QPropertyAnimation *anim = new QPropertyAnimation(button1, "geometry");
-    anim->setDuration(1000);
-    anim->setEasingCurve(QEasingCurve::OutInBounce);
-    subGroup->addAnimation(anim);
-
-    subGroup = new QSequentialAnimationGroup(&animationGroup);
-    subGroup->addPause(200);
-    anim = new QPropertyAnimation(button2, "geometry");
-    anim->setDuration(1000);
-    anim->setEasingCurve(QEasingCurve::OutBounce);
-    subGroup->addAnimation(anim);
-
-    subGroup = new QSequentialAnimationGroup(&animationGroup);
-    subGroup->addPause(200);
-    anim = new QPropertyAnimation(button3, "geometry");
-    anim->setDuration(1000);
-    anim->setEasingCurve(QEasingCurve::OutCirc);
-    subGroup->addAnimation(anim);
-
-    subGroup = new QSequentialAnimationGroup(&animationGroup);
-    subGroup->addPause(200);
-    anim = new QPropertyAnimation(button4, "geometry");
-    anim->setDuration(1000);
-    anim->setEasingCurve(QEasingCurve::OutCubic);
-    subGroup->addAnimation(anim);
-
-    subGroup = new QSequentialAnimationGroup(&animationGroup);
-    subGroup->addPause(200);
-    anim = new QPropertyAnimation(button5, "geometry");
-    anim->setDuration(1000);
-    anim->setEasingCurve(QEasingCurve::OutCurve);
-    subGroup->addAnimation(anim);
-
-    subGroup = new QSequentialAnimationGroup(&animationGroup);
-    subGroup->addPause(200);
-    anim = new QPropertyAnimation(button6, "geometry");
-    anim->setDuration(1000);
-    anim->setEasingCurve(QEasingCurve::OutElastic);
-    subGroup->addAnimation(anim);
-
-    subGroup = new QSequentialAnimationGroup(&animationGroup);
-    subGroup->addPause(200);
-    anim = new QPropertyAnimation(button7, "geometry");
-    anim->setDuration(1000);
-    anim->setEasingCurve(QEasingCurve::OutQuad);
-    subGroup->addAnimation(anim);
-
-    subGroup = new QSequentialAnimationGroup(&animationGroup);
-    subGroup->addPause(200);
-    anim = new QPropertyAnimation(button8, "geometry");
-    anim->setDuration(500);
-    anim->setEasingCurve(QEasingCurve::OutSine);
-    subGroup->addAnimation(anim);
-
-    StateSwitcher *stateSwitcher = new StateSwitcher(&machine);
-    stateSwitcher->setObjectName("stateSwitcher");
-    group->addTransition(&timer, SIGNAL(timeout()), stateSwitcher);
-    stateSwitcher->addState(state1, &animationGroup);
-    stateSwitcher->addState(state2, &animationGroup);
-
-    machine.addState(group);
-    machine.setInitialState(group);
-    machine.start();
-
-    window.resize(800, 600);
-    window.show();
-
-    qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
-
-    return app.exec();
-}
-
-void keyPressEvent(QKeyEvent *event)
-{
-    switch (event->key()) {
-    case Qt::Key_Left:
-        break;
-    case Qt::Key_Right:
-        break;
-    case Qt::Key_Down:
-        break;
-    case Qt::Key_Up:
-        break;
-    case Qt::Key_Space:
-        break;
-    case Qt::Key_D:
-        qDebug() << "keyPressEvent: D";
-        break;
-    default:
-        break;
+    QList<Pixmap *> items;
+    for (int i = 0; i < 64; ++i) {
+        Pixmap *item = new Pixmap(kineticPix);
+        item->setOffset(-kineticPix.width()/2, -kineticPix.height()/2);
+        item->setZValue(i);
+        items << item;
+        scene.addItem(item);
     }
+
+    // Buttons
+    QGraphicsItem *buttonParent = new QGraphicsRectItem;
+    Button *ellipseButton = new Button(QPixmap(":/images/ellipse.png"), buttonParent);
+    Button *figure8Button = new Button(QPixmap(":/images/figure8.png"), buttonParent);
+    Button *randomButton = new Button(QPixmap(":/images/random.png"), buttonParent);
+    Button *tiledButton = new Button(QPixmap(":/images/tile.png"), buttonParent);
+    Button *centeredButton = new Button(QPixmap(":/images/centered.png"), buttonParent);
+
+    ellipseButton->setPos(-100, -100);
+    figure8Button->setPos(100, -100);
+    randomButton->setPos(0, 0);
+    tiledButton->setPos(-100, 100);
+    centeredButton->setPos(100, 100);
+
+    scene.addItem(buttonParent);
+    buttonParent->scale(0.75, 0.75);
+    buttonParent->setPos(200, 200);
+    buttonParent->setZValue(65);
+
+    // States
+    QState *rootState = new QState;
+    QState *ellipseState = new QState(rootState);
+    QState *figure8State = new QState(rootState);
+    QState *randomState = new QState(rootState);
+    QState *tiledState = new QState(rootState);
+    QState *centeredState = new QState(rootState);
+
+    // Values
+    for (int i = 0; i < items.count(); ++i) {
+        Pixmap *item = items.at(i);
+        // Ellipse
+        ellipseState->assignProperty(item, "pos",
+                                         QPointF(cos((i / 63.0) * 6.28) * 250,
+                                                 sin((i / 63.0) * 6.28) * 250));
+
+        // Figure 8
+        figure8State->assignProperty(item, "pos",
+                                         QPointF(sin((i / 63.0) * 6.28) * 250,
+                                                 sin(((i * 2)/63.0) * 6.28) * 250));
+
+        // Random
+        randomState->assignProperty(item, "pos",
+                                        QPointF(-250 + qrand() % 500,
+                                                -250 + qrand() % 500));
+
+        // Tiled
+        tiledState->assignProperty(item, "pos",
+                                       QPointF(((i % 8) - 4) * kineticPix.width() + kineticPix.width() / 2,
+                                               ((i / 8) - 4) * kineticPix.height() + kineticPix.height() / 2));
+
+        // Centered
+        centeredState->assignProperty(item, "pos", QPointF());
+    }
+
+    // Ui
+    View *view = new View(&scene);
+    view->setWindowTitle(QT_TRANSLATE_NOOP(QGraphicsView, "Animated Tiles"));
+    view->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
+    view->setBackgroundBrush(bgPix);
+    view->setCacheMode(QGraphicsView::CacheBackground);
+    view->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    view->show();
+
+    QStateMachine states;
+    states.addState(rootState);
+    states.setInitialState(rootState);
+    rootState->setInitialState(centeredState);
+
+    QParallelAnimationGroup *group = new QParallelAnimationGroup;
+    for (int i = 0; i < items.count(); ++i) {
+        QPropertyAnimation *anim = new QPropertyAnimation(items[i], "pos");
+        anim->setDuration(750 + i * 25);
+        anim->setEasingCurve(QEasingCurve::InOutBack);
+        group->addAnimation(anim);
+    }
+    QAbstractTransition *trans = rootState->addTransition(ellipseButton, SIGNAL(pressed()), ellipseState);
+    trans->addAnimation(group);
+
+    trans = rootState->addTransition(figure8Button, SIGNAL(pressed()), figure8State);
+    trans->addAnimation(group);
+
+    trans = rootState->addTransition(randomButton, SIGNAL(pressed()), randomState);
+    trans->addAnimation(group);
+
+    trans = rootState->addTransition(tiledButton, SIGNAL(pressed()), tiledState);
+    trans->addAnimation(group);
+
+    trans = rootState->addTransition(centeredButton, SIGNAL(pressed()), centeredState);
+    trans->addAnimation(group);
+
+    QTimer timer;
+    timer.start(125);
+    timer.setSingleShot(true);
+    trans = rootState->addTransition(&timer, SIGNAL(timeout()), ellipseState);
+    trans->addAnimation(group);
+
+    states.start();
+
+#ifdef QT_KEYPAD_NAVIGATION
+    QApplication::setNavigationMode(Qt::NavigationModeCursorAuto);
+#endif
+    return app.exec();
 }
 
 #include "main.moc"

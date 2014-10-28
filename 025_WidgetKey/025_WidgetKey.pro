@@ -13,13 +13,18 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        qkeycollide.cpp \
     draw.cpp \
-    startmenu.cpp
+    startmenu.cpp \
+    chat.cpp \
+    choosemenu.cpp \
+    qkeycollide.cpp
 
 HEADERS  += qkeycollide.h \
     draw.h \
-    startmenu.h
+    startmenu.h \
+    chat.h \
+    choosemenu.h \
+    definitions.h
 
 FORMS    += \
     startmenu.ui

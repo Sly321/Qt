@@ -5,6 +5,8 @@
 #include <QStackedWidget>
 #include "draw.h"
 #include "startmenu.h"
+#include "chat.h"
+#include "choosemenu.h"
 
 class QKeyCollide : public QWidget
 {
@@ -19,10 +21,12 @@ private:
     QLineEdit *line;
     QTextEdit *text;
     StartMenu *startmenu;
+    Chat *chat;
+    ChooseMenu *chooseMenu;
+
 
 private slots:
-    void hideChat();
-    void chatLostFocus();
+    void setChooseMenu(int a);
 
 protected:
     void keyPressEvent(QKeyEvent *e);

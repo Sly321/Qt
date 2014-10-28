@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Draw_t {
-    QByteArrayData data[3];
-    char stringdata[10];
+    QByteArrayData data[4];
+    char stringdata[21];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -31,9 +31,10 @@ static const qt_meta_stringdata_Draw_t qt_meta_stringdata_Draw = {
     {
 QT_MOC_LITERAL(0, 0, 4),
 QT_MOC_LITERAL(1, 5, 3),
-QT_MOC_LITERAL(2, 9, 0)
+QT_MOC_LITERAL(2, 9, 0),
+QT_MOC_LITERAL(3, 10, 10)
     },
-    "Draw\0fps\0"
+    "Draw\0fps\0\0q_animRect"
 };
 #undef QT_MOC_LITERAL
 
@@ -44,7 +45,7 @@ static const uint qt_meta_data_Draw[] = {
        0,       // classname
        0,    0, // classinfo
        1,   14, // methods
-       0,    0, // properties
+       1,   20, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
@@ -55,6 +56,9 @@ static const uint qt_meta_data_Draw[] = {
 
  // slots: parameters
     QMetaType::Int,
+
+ // properties: name, type, flags
+       3, QMetaType::QRect, 0x00095003,
 
        0        // eod
 };
@@ -104,6 +108,39 @@ int Draw::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
             *reinterpret_cast<int*>(_a[0]) = -1;
         _id -= 1;
     }
+#ifndef QT_NO_PROPERTIES
+      else if (_c == QMetaObject::ReadProperty) {
+        void *_v = _a[0];
+        switch (_id) {
+        case 0: *reinterpret_cast< QRect*>(_v) = getAnimRect(); break;
+        default: break;
+        }
+        _id -= 1;
+    } else if (_c == QMetaObject::WriteProperty) {
+        void *_v = _a[0];
+        switch (_id) {
+        case 0: setAnimRect(*reinterpret_cast< QRect*>(_v)); break;
+        default: break;
+        }
+        _id -= 1;
+    } else if (_c == QMetaObject::ResetProperty) {
+        _id -= 1;
+    } else if (_c == QMetaObject::QueryPropertyDesignable) {
+        _id -= 1;
+    } else if (_c == QMetaObject::QueryPropertyScriptable) {
+        _id -= 1;
+    } else if (_c == QMetaObject::QueryPropertyStored) {
+        _id -= 1;
+    } else if (_c == QMetaObject::QueryPropertyEditable) {
+        _id -= 1;
+    } else if (_c == QMetaObject::QueryPropertyUser) {
+        _id -= 1;
+    } else if (_c == QMetaObject::RegisterPropertyMetaType) {
+        if (_id < 1)
+            *reinterpret_cast<int*>(_a[0]) = -1;
+        _id -= 1;
+    }
+#endif // QT_NO_PROPERTIES
     return _id;
 }
 QT_END_MOC_NAMESPACE
