@@ -14,7 +14,9 @@ QImage Sprite::getImage() {
 
 QImage Sprite::getImage(int sequence) {
     if (sequence <= anzahl) {
-        return bild;
+        QRect rect(y * (sequence), 0, y, y);
+        QImage returnImage = bild.copy(rect);
+        return returnImage;
     } else {
         return bild;
     }

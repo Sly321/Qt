@@ -2,9 +2,7 @@
 #define DRAW_H
 
 #include <QtWidgets>
-#include <QTimer>
-
-#include "sprite.h"
+#include "character.h"
 
 class Draw : public QWidget
 {
@@ -30,8 +28,7 @@ public slots:
     int fps();
 
 private:
-    QImage spriteImage;
-    Sprite *sprite;
+    Character *character;
     QRect animRect;
     bool showFps;
     int xpos;

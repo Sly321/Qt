@@ -1,13 +1,11 @@
 #include "draw.h"
-#include <QtWidgets>
 
 Draw::Draw(QWidget *parent) : QWidget(parent)
 {
     /* Bools initialization */
     showFps = false;
 
-
-    sprite = new Sprite(QImage(":/sprites/stand.png"));
+    character = new Character();
 
     parentWindow = parent;
 
@@ -86,7 +84,9 @@ void Draw::paintEvent(QPaintEvent *e) {
 
     if(showFps) { textPainter.drawText(QRect(700,0,80,20), "FPS: " + QString::number(fpsInt)); }
 
-    textPainter.drawImage(200,180, sprite->getImage(2));
+
+
+    textPainter.drawImage(character->getX(), character->getY(), character->getChar());
     textPainter.drawRect(animRect);
     textPainter.drawText(animRect, "X", QTextOption(Qt::AlignCenter));
 

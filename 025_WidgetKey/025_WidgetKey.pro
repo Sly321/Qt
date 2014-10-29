@@ -18,7 +18,8 @@ SOURCES += main.cpp\
     chat.cpp \
     choosemenu.cpp \
     qkeycollide.cpp \
-    sprite.cpp
+    sprite.cpp \
+    character.cpp
 
 HEADERS  += qkeycollide.h \
     draw.h \
@@ -26,7 +27,8 @@ HEADERS  += qkeycollide.h \
     chat.h \
     choosemenu.h \
     definitions.h \
-    sprite.h
+    sprite.h \
+    character.h
 
 FORMS    += \
     startmenu.ui
