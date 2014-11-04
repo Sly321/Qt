@@ -53,7 +53,9 @@ int main(int argc, char *argv[])
     Write(filePath, "Hello Worlds Greatest");
     Read(filePath);
 
-    Read(":/MyFiles/009_Files.pro");
+
+
+    //Read(":/MyFiles/009_Files.pro");
 
     return a.exec();
 }

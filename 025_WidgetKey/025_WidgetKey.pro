@@ -17,18 +17,19 @@ SOURCES += main.cpp\
     startmenu.cpp \
     chat.cpp \
     choosemenu.cpp \
-    qkeycollide.cpp \
     sprite.cpp \
-    character.cpp
+    character.cpp \
+    fighterino.cpp
 
-HEADERS  += qkeycollide.h \
+HEADERS  += \
     draw.h \
     startmenu.h \
     chat.h \
     choosemenu.h \
     definitions.h \
     sprite.h \
-    character.h
+    character.h \
+    fighterino.h
 
 FORMS    += \
     startmenu.ui
